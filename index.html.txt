@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Konut Kredisi Faiz Oranı Hesaplayıcı</title>
+  <style>
+    body { font-family: Arial, sans-serif; background-color: #f2f2f2; padding: 20px; }
+    .container { background: white; max-width: 700px; margin: auto; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h2 { text-align: center; color: #333; }
+    label, input { display: block; width: 100%; margin-bottom: 10px; }
+    input[type="number"] { padding: 8px; font-size: 16px; }
+    button { padding: 10px 20px; font-size: 16px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background-color: #218838; }
+    .output { white-space: pre-wrap; margin-top: 20px; font-size: 15px; background: #f9f9f9; padding: 15px; border-left: 4px solid #28a745; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Konut Kredisi Faiz Oranı Hesaplayıcı</h2>
+    <label for="kredi">Kaç milyon TL kredi kullanmak istiyorsunuz?</label>
+    <input type="number" id="kredi" step="0.01" placeholder="Örn: 1.5">
+
+    <label for="vade">Kaç ay vade istiyorsunuz?</label>
+    <input type="number" id="vade" placeholder="Örn: 36">
+
+    <button onclick="hesapla()">Hesapla</button>
+
+    <div class="output" id="sonuc"></div>
+  </div>
+
+  <script>
+    function uygunFaiz(vade, oranlar) {
+      for (let [ay, oran] of oranlar) {
+        if (vade <= ay) return oran;
+      }
+      return oranlar[oranlar.length - 1][1];
+    }
+
+    function hesapla() {
+      const krediMilyon = parseFloat(document.getElementById("kredi").value);
+      const vade = parseInt(document.getElementById("vade").value);
+      if (isNaN(krediMilyon) || isNaN(vade)) return alert("Lütfen geçerli değerler girin.");
+
+      const krediTutari = krediMilyon * 1000000;
+
+      const sonuc = `Merhaba,
+
+Aşağıdaki BDDK tebliği ile uyum sağlanıyor ise;
+
+${krediTutari.toLocaleString('tr-TR')} ₺, ${vade} ay emlakçı yönlendirmeli konut kredisi için;
+
+Uzun süreli HYT ve Çapraz satış zorunlu, bayi marjı ile:
+İlk Evim Kampanyası (9270 HYT) için ${vade} Ay Faiz Oranı: %3.10
+BSMV’li Kampanya (30017 HYT) için ${vade} Ay Faiz Oranı: %3.10
+
+HYT opsiyonel ve bayi marjı ile:
+İlk Evim Kampanyası (9270 TRL) için ${vade} Ay Faiz Oranı: %3.16
+BSMV’li Kampanya (2570 TRL) için ${vade} Ay Faiz Oranı: %3.16
+
+%3 Peşin Faizli | Uzun süreli HYT ve çapraz satış zorunlu, bayi marjı ile:
+BSMV’siz Kampanya (9270 HYT3) için ${vade} Ay Faiz Oranı: %${uygunFaiz(vade, [[12,2.59],[24,2.82],[36,2.90],[48,2.93],[60,2.96],[72,2.97],[84,2.98],[96,2.99],[108,2.99],[120,3.00]]).toFixed(2)}
+BSMV’li Kampanya (30017 HYT3) için ${vade} Ay Faiz Oranı: %${uygunFaiz(vade, [[12,2.66],[24,2.85],[36,2.92],[48,2.96],[60,2.98],[72,2.99],[84,3.00],[96,3.00],[108,3.01],[120,3.01]]).toFixed(2)}
+
+Hayat Sigortasız ve bayi marjı ile:
+BSMV’siz Kampanya (9270 TRL3) için ${vade} Ay Faiz Oranı: %${uygunFaiz(vade, [[12,2.65],[24,2.88],[36,2.95],[48,2.99],[60,3.02],[72,3.03],[84,3.04],[96,3.05],[108,3.05],[120,3.06]]).toFixed(2)}
+BSMV’li Kampanya (2570 TRL99-2) için ${vade} Ay Faiz Oranı: %${uygunFaiz(vade, [[12,2.72],[24,2.91],[36,2.98],[48,3.02],[60,3.04],[72,3.05],[84,3.06],[96,3.06],[108,3.07],[120,3.07]]).toFixed(2)}`;
+
+      document.getElementById("sonuc").innerText = sonuc;
+    }
+  </script>
+</body>
+</html>
